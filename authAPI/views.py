@@ -36,7 +36,7 @@ class UserViewSet(viewsets.ModelViewSet):
         ]
     )
     def retrieve(self, request, *args, **kwargs):
-        error_response = verify_refresh_token(request, kwargs.get('pk')) # type: ignore
+        error_response = verify_refresh_token(request, kwargs.get('pk'))
         if error_response:
             return error_response
         return super().retrieve(request, *args, **kwargs)
@@ -47,7 +47,7 @@ class UserViewSet(viewsets.ModelViewSet):
         ]
     )
     def update(self, request, *args, **kwargs):
-        error_response = verify_refresh_token(request, kwargs.get('pk')) # type: ignore
+        error_response = verify_refresh_token(request, kwargs.get('pk'))
         if error_response:
             return error_response
         return super().update(request, *args, **kwargs)
@@ -58,7 +58,7 @@ class UserViewSet(viewsets.ModelViewSet):
         ]
     )
     def partial_update(self, request, *args, **kwargs):
-        error_response = verify_refresh_token(request, kwargs.get('pk')) # type: ignore
+        error_response = verify_refresh_token(request, kwargs.get('pk'))
         if error_response:
             return error_response
         return super().partial_update(request, *args, **kwargs)
@@ -69,7 +69,7 @@ class UserViewSet(viewsets.ModelViewSet):
         ]
     )
     def destroy(self, request, *args, **kwargs):
-        error_response = verify_refresh_token_and_superuser(request) # type: ignore
+        error_response = verify_refresh_token_and_superuser(request)
         if error_response:
             return error_response
         return super().destroy(request, *args, **kwargs)
@@ -162,7 +162,7 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def logout(self, request):
         id = request.data.get('user_id') or request.query_params.get('user_id')
-        error_response = verify_refresh_token(request, id) # type: ignore
+        error_response = verify_refresh_token(request, id)
         if error_response:
             return error_response
         

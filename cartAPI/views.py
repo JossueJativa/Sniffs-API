@@ -39,18 +39,18 @@ class CartViewSet(viewsets.ModelViewSet):
     )
     def create(self, request, *args, **kwargs):
         decodeJWT = jwt.decode(request.query_params.get('refresh'), options={"verify_signature": False})
-        user_id = decodeJWT['user_id']
+        user_id = request.data.get('user_id') if request.data.get('user_id') else decodeJWT['user_id']
         error_response = verify_refresh_token(request, user_id)
         if error_response:
             return error_response
         
+        product_id = request.data.get('product')
+        
         try:
             user = User.objects.get(id=user_id)
-            cart = Cart.objects.get(user=user)
-            
-            product_id = request.data.get('product')
+            cart = Cart.objects.get(user=user, product=product_id)
 
-            product = Product.objects.get(id=product_id)
+            product = Product.objects.get(pk=product_id)
         except Product.DoesNotExist:
             return Response({'error': 'Invalid product ID'}, status=400)
         except User.DoesNotExist:
@@ -156,9 +156,16 @@ class CartViewSet(viewsets.ModelViewSet):
 
         try:
             user = User.objects.get(id=user_id)
-            cart = Cart.objects.get(user=user)
-            serializer = CartSerializer(cart)
-            return Response(serializer.data)
+            cart = Cart.objects.filter(user=user)
+            cart_detail = []
+            for item in cart:
+                cart_detail.append({
+                    'id': item.id, # type: ignore
+                    'product': item.product.name,
+                    'price': item.product.price,
+                    'quantity': item.quantity
+                })
+            return Response(cart_detail)
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=401)
         except Cart.DoesNotExist:
