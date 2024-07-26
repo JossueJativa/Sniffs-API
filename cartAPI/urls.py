@@ -1,4 +1,5 @@
 from .views import CartViewSet
+from .consumers import CartConsumer
 from rest_framework.routers import DefaultRouter
 
 app_name = 'cartAPI'
