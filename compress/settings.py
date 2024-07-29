@@ -93,8 +93,6 @@ TEMPLATES = [
     },
 ]
 
-ASGI_APPLICATION = 'compress.routing.application'
-
 WSGI_APPLICATION = 'compress.wsgi.application'
 
 AUTH_USER_MODEL = 'authAPI.User'
@@ -168,6 +166,7 @@ CORS_ALLOW_METHODS = [
     'PATCH',
     'POST',
     'PUT',
+    'HANDSHAKE',
 ]
 
 CORS_ALLOW_HEADERS = [
