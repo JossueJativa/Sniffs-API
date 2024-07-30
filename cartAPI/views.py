@@ -162,8 +162,9 @@ class CartViewSet(viewsets.ModelViewSet):
                 cart_detail.append({
                     'id': item.id, # type: ignore
                     'product': item.product.name,
-                    'price': item.product.price,
-                    'quantity': item.quantity
+                    'price': item.product.price + item.product.installation,
+                    'quantity': item.quantity,
+                    'product_id': item.product.id # type: ignore
                 })
             return Response(cart_detail)
         except User.DoesNotExist:
