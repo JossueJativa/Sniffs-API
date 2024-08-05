@@ -10,8 +10,6 @@ from authAPI.models import User
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-import jwt
-
 class BillHeaderViewSet(viewsets.ModelViewSet):
     queryset = BillHeader.objects.all()
     serializer_class = BillHeaderSerializer
