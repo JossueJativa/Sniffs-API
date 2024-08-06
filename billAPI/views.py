@@ -1,5 +1,6 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
 from verifyToken import verify_refresh_token, verify_refresh_token_and_superuser
 
@@ -150,3 +151,45 @@ class BillDetailViewSet(viewsets.ModelViewSet):
         if error_response:
             return error_response
         return super().destroy(request, *args, **kwargs)
+    
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('refresh', openapi.IN_QUERY, description="Refresh Token", type=openapi.TYPE_STRING),
+            openapi.Parameter('user_id', openapi.IN_QUERY, description="User ID", type=openapi.TYPE_INTEGER)
+        ]
+    )
+    @action(detail=False, methods=['get'])
+    def getUserHistory(self, request, *args, **kwargs):
+        user_id = request.query_params.get('user_id')
+
+        if not user_id:
+            return Response({'error': 'User ID is required'}, status=400)
+
+        error_response = verify_refresh_token(request, user_id)
+        if error_response:
+            return error_response
+
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=404)
+
+        # Eliminar los BillHeader sin total o con total igual a 0
+        BillHeader.objects.filter(user=user, total__isnull=True).delete()
+        BillHeader.objects.filter(user=user, total=0).delete()
+
+        bills = BillHeader.objects.filter(user=user)
+        response = []
+        for bill in bills:
+            bill_details = BillDetail.objects.filter(bill_header=bill)
+            total = sum(detail.price * detail.quantity for detail in bill_details)
+            products = [
+                {'product': detail.product.name, 'quantity': detail.quantity}
+                for detail in bill_details
+            ]
+            response.append({
+                'total': total,
+                'products': products
+            })
+
+        return Response(response)
