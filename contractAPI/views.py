@@ -50,7 +50,6 @@ class ContractViewSet(viewsets.ModelViewSet):
         ]
     )
     def create(self, request, *args, **kwargs):
-        print(request.data)
         error_response = self.verify_refresh_token_and_superuser(request)
         if error_response:
             return error_response
