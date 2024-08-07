@@ -1,5 +1,8 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
+from rest_framework.decorators import action
+
+from verifyToken import verify_refresh_token
 
 from .serializer import ContractSerializer
 from .models import Contract
@@ -98,3 +101,38 @@ class ContractViewSet(viewsets.ModelViewSet):
         if error_response:
             return error_response
         return super().destroy(request, *args, **kwargs)
+    
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('refresh', openapi.IN_QUERY, description="Refresh Token", type=openapi.TYPE_STRING),
+            openapi.Parameter('user_id', openapi.IN_QUERY, description="ID of the contract", type=openapi.TYPE_INTEGER)
+        ]
+    )
+    @action(detail=False, methods=['get'])
+    def getContractByUserId(self, request):
+        error_response = verify_refresh_token(request)
+        if error_response:
+            return error_response
+        
+        user_id = request.query_params.get('user_id')
+        if not user_id:
+            return Response({'error': 'User ID is required'}, status=400)
+        
+        try:
+            user_id = int(user_id)
+        except:
+            return Response({'error': 'Invalid user ID'}, status=400)
+        
+        contracts = Contract.objects.filter(user_id=user_id)
+        data = []
+        # Enviar la fecha de inicio y fin, estado, total y el id del contrato
+        for contract in contracts:
+            data.append({
+                'id': contract.id, # type: ignore
+                'start_date': contract.date_start, # type: ignore
+                'end_date': contract.date_end, # type: ignore
+                'status': contract.status,
+                'total': contract.product.price,
+                'description': contract.product.name
+            })
+        return Response(data)
