@@ -29,6 +29,7 @@ urlpatterns = [
     path('bill/', include('billAPI.urls')),
     path('comment/', include('commentAPI.urls')),
     path('cart/', include('cartAPI.urls')),
+    path('quotation/', include('quotation.urls')),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
 

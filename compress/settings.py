@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'billAPI',
     'commentAPI',
     'cartAPI',
+    'quotation',
 
     # auth user
     'rest_framework',
