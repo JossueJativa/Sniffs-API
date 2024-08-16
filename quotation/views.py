@@ -61,6 +61,18 @@ class QuotationHeaderViewSet(viewsets.ModelViewSet):
             return error_response
         return super().partial_update(request, *args, **kwargs)
     
+    # List
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('refresh', openapi.IN_QUERY, description="Refresh Token", type=openapi.TYPE_STRING)
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        error_response = verify_refresh_token(request)
+        if error_response:
+            return error_response
+        return super().list(request, *args, **kwargs)
+    
 class QuotationDetailViewSet(viewsets.ModelViewSet):
     queryset = QuotationDetail.objects.all()
     serializer_class = QuotationDetailSerializer
@@ -71,6 +83,7 @@ class QuotationDetailViewSet(viewsets.ModelViewSet):
         ]
     )
     def create(self, request, *args, **kwargs):
+        print(request.data)
         error_response = verify_refresh_token(request)
         if error_response:
             return error_response
